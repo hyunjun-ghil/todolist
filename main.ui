@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>825</width>
+    <width>821</width>
     <height>764</height>
    </rect>
   </property>
@@ -27,7 +27,7 @@
    <widget class="QPushButton" name="addListBtn">
     <property name="geometry">
      <rect>
-      <x>640</x>
+      <x>650</x>
       <y>510</y>
       <width>151</width>
       <height>41</height>
@@ -40,7 +40,7 @@
    <widget class="QPushButton" name="doneListBtn">
     <property name="geometry">
      <rect>
-      <x>640</x>
+      <x>650</x>
       <y>560</y>
       <width>151</width>
       <height>41</height>
@@ -53,7 +53,7 @@
    <widget class="QPushButton" name="deleteListBtn">
     <property name="geometry">
      <rect>
-      <x>640</x>
+      <x>650</x>
       <y>610</y>
       <width>151</width>
       <height>41</height>
@@ -94,7 +94,7 @@
      <rect>
       <x>0</x>
       <y>230</y>
-      <width>791</width>
+      <width>821</width>
       <height>16</height>
      </rect>
     </property>
@@ -112,7 +112,7 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="todayLabel">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -136,7 +136,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
+   <widget class="QLabel" name="timeLabel">
     <property name="geometry">
      <rect>
       <x>30</x>
@@ -147,15 +147,18 @@
     </property>
     <property name="font">
      <font>
-      <family>HY중고딕</family>
-      <pointsize>18</pointsize>
-      <weight>75</weight>
-      <bold>true</bold>
+      <family>HY견고딕</family>
+      <pointsize>44</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
       <strikeout>false</strikeout>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">color:skyblue</string>
+    </property>
     <property name="frameShape">
-     <enum>QFrame::Box</enum>
+     <enum>QFrame::NoFrame</enum>
     </property>
     <property name="text">
      <string>Time</string>
@@ -190,13 +193,37 @@
      <string>▶</string>
     </property>
    </widget>
+   <widget class="QLabel" name="todayLabel_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>250</y>
+      <width>611</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Franklin Gothic Demi</family>
+      <pointsize>18</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Today's To Do List :) Cheer Up!</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>825</width>
+     <width>821</width>
      <height>21</height>
     </rect>
    </property>
