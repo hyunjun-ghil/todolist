@@ -1,8 +1,9 @@
-import sys, os, time
+import sys, os, time, datetime
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5 import QtWidgets, QtCore, uic
+from random import *
 from functools import partial
 
 # UI파일 연결
@@ -31,26 +32,65 @@ class MainWindow(QMainWindow, main_class):
         timer.timeout.connect(self.showTime)
         timer.start(200)
 
-        self.addListBtn.clicked.connect(self.saveBtnClicked)
+        self.saveMenu.triggered.connect(self.saveMenuClicked)
 
-        self.moveRightBtn.clicked.connect(self.moveRightBtnClicked)
-        self.moveLeftBtn.clicked.connect(self.moveLeftBtnClicked)
+        self.addListBtn.clicked.connect(self.addListBtnClicked)
+        self.doneListBtn.clicked.connect(self.doneListBtnClicked)
+        self.deleteListBtn.clicked.connect(self.deleteListBtnClicked)
+
         self.moveUpBtn.clicked.connect(self.moveUpBtnClicked)
         self.moveDownBtn.clicked.connect(self.moveDownBtnClicked)
+        self.moveRightBtn.clicked.connect(self.moveRightBtnClicked)
+        self.moveLeftBtn.clicked.connect(self.moveLeftBtnClicked)
 
         self.mainList.itemClicked.connect(self.listClicked)
         self.calendarWidget.clicked.connect(self.calendarClicked)
 
-    def saveBtnClicked(self):
+        wiseSayingList = []
+        f = open("./wisesaying.txt", 'r', encoding='utf8')
+        print(f)
+        while True:
+            fline = f.readline()
+            if not fline: break
+            wiseSayingList.append(fline.replace("\n", ""))
+
+        i = randint(0, len(wiseSayingList))
+        self.wiseLabel.setText(wiseSayingList[i])
+
+    def saveMenuClicked(self):
+        curdatetime = str(datetime.date.today()) + ".txt"
+        file = open(curdatetime, "w")
+        for i in range(0, self.mainList.count()):
+            ts = str(self.mainList.item(i).checkState()) + ":" + self.mainList.item(i).text() + "\n"
+            file.write(ts)
+        file.close()
+        QMessageBox.information(self, "result", "저장되었습니다.")
+
+    def showTime(self):
+        current_time = QTime.currentTime()
+        label_time = current_time.toString('hh:mm:ss')
+        self.timeLabel.setText(label_time)
+
+    def addListBtnClicked(self):
         item = QtWidgets.QListWidgetItem("New List Added:) Write Here")
         item.setFont(QFont("맑은 고딕", 13))
         item.setFlags(item.flags() | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEditable)
         item.setCheckState(QtCore.Qt.Unchecked)
         self.mainList.addItem(item)
 
-    def listClicked(self):
-        global curItem
-        curItem = self.mainList.currentItem()
+    def doneListBtnClicked(self):
+        currentRow = self.mainList.currentItem()
+        if currentRow.checkState() == Qt.Checked:
+            currentRow.setCheckState(QtCore.Qt.Unchecked)
+            currentRow.setBackground(Qt.white)
+        else:
+            currentRow.setCheckState(QtCore.Qt.Checked)
+            currentRow.setBackground(Qt.gray)
+
+    def deleteListBtnClicked(self):
+        currentRow = self.mainList.currentRow()
+        self.mainList.takeItem(currentRow)
+
 
     def moveUpBtnClicked(self):
         currentRow = self.mainList.currentRow()
@@ -76,14 +116,60 @@ class MainWindow(QMainWindow, main_class):
         curItemText = curItem.text().replace("    ", "", 1)
         self.mainList.currentItem().setText(curItemText)
 
+    def listClicked(self):
+        global curItem
+        curItem = self.mainList.currentItem()
+
     def calendarClicked(self):
         today = self.calendarWidget.selectedDate().toString(Qt.DefaultLocaleLongDate)
         self.todayLabel.setText(today)
+        self.mainList.clear()
+        textFile = "./" + str(self.calendarWidget.selectedDate().toString(Qt.ISODate)) + ".txt"
+        try:
+            f = open(textFile, 'r')
+        except OSError as e:
+            messagebox = TimerMessageBox(1, self, "저장된 TodoList가 없습니다. 그렇다고 굳이 파일을 생성하지 않으셔도 됩니다.")
+            messagebox.exec_()
+            return
+        while True:
+            line = f.readline()
+            if not line: break
+            column = line.split(":")
+            if column[0] == '2':
+                item = QtWidgets.QListWidgetItem(column[1].replace("\n", ""))
+                item.setFont(QFont("맑은 고딕", 13))
+                item.setFlags(item.flags() | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEditable)
+                item.setCheckState(QtCore.Qt.Checked)
+                item.setBackground(Qt.gray)
+                self.mainList.addItem(item)
+            else:
+                item = QtWidgets.QListWidgetItem(column[1].replace("\n", ""))
+                item.setFont(QFont("맑은 고딕", 13))
+                item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+                item.setCheckState(QtCore.Qt.Unchecked)
+                self.mainList.addItem(item)
 
-    def showTime(self):
-        current_time = QTime.currentTime()
-        label_time = current_time.toString('hh:mm:ss')
-        self.timeLabel.setText(label_time)
+class TimerMessageBox(QMessageBox):
+    def __init__(self, timeout=1, parent=None, text=""):
+        super(TimerMessageBox, self).__init__(parent)
+        self.setWindowTitle("info")
+        self.time_to_wait = timeout
+        self.setText(text)
+        self.setStandardButtons(QMessageBox.NoButton)
+        self.timer = QtCore.QTimer(self)
+        self.timer.setInterval(1000)
+        self.timer.timeout.connect(self.changeContent)
+        self.timer.start()
+
+    def changeContent(self):
+        self.time_to_wait -= 1
+        if self.time_to_wait <= 0:
+            self.close()
+
+    def closeEvent(self, event):
+        self.timer.stop()
+        event.accept()
+
 
 
 if __name__ == "__main__" :
@@ -91,4 +177,3 @@ if __name__ == "__main__" :
     myWindow = MainWindow()
     myWindow.show()
     app.exec_()
-
