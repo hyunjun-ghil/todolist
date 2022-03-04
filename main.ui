@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>821</width>
-    <height>795</height>
+    <height>794</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -247,6 +247,17 @@
     <property name="alignment">
      <set>Qt::AlignCenter</set>
     </property>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>649</x>
+      <y>330</y>
+      <width>151</width>
+      <height>211</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout"/>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

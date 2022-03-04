@@ -4,12 +4,14 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5 import QtWidgets, QtCore, uic
 from random import *
-from functools import partial
+import googleCalendar
+
 
 # UI파일 연결
 # 단, UI파일은 Python 코드 파일과 같은 디렉토리에 위치해야한다.
 global curItem
-
+gCalendar = []
+gCalendar.append(googleCalendar.main())
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -17,6 +19,7 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 main_class = uic.loadUiType(resource_path("main.ui"))[0]
+wiseSayingFile = resource_path("wisesaying.txt")
 
 class MainWindow(QMainWindow, main_class):
     def __init__(self) :
@@ -32,6 +35,15 @@ class MainWindow(QMainWindow, main_class):
         timer.timeout.connect(self.showTime)
         timer.start(200)
 
+        i = 0
+        for data in gCalendar:
+            i = i + 1
+            checkboxdata = data[i][0] + data[i][1] + data[i][2]
+            print(checkboxdata)
+            globals()["self.pushButton{}".format(i)] = QCheckBox(checkboxdata)
+            self.verticalLayout.addWidget(globals()["self.pushButton{}".format(i)])
+
+
         self.saveMenu.triggered.connect(self.saveMenuClicked)
 
         self.addListBtn.clicked.connect(self.addListBtnClicked)
@@ -46,9 +58,10 @@ class MainWindow(QMainWindow, main_class):
         self.mainList.itemClicked.connect(self.listClicked)
         self.calendarWidget.clicked.connect(self.calendarClicked)
 
+
+
         wiseSayingList = []
-        f = open("./wisesaying.txt", 'r', encoding='utf8')
-        print(f)
+        f = open(wiseSayingFile, 'r', encoding='utf8')
         while True:
             fline = f.readline()
             if not fline: break
