@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>821</width>
-    <height>794</height>
+    <height>811</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,8 +27,8 @@
    <widget class="QPushButton" name="addListBtn">
     <property name="geometry">
      <rect>
-      <x>650</x>
-      <y>560</y>
+      <x>20</x>
+      <y>680</y>
       <width>151</width>
       <height>41</height>
      </rect>
@@ -40,8 +40,8 @@
    <widget class="QPushButton" name="doneListBtn">
     <property name="geometry">
      <rect>
-      <x>650</x>
-      <y>610</y>
+      <x>250</x>
+      <y>680</y>
       <width>151</width>
       <height>41</height>
      </rect>
@@ -53,8 +53,8 @@
    <widget class="QPushButton" name="deleteListBtn">
     <property name="geometry">
      <rect>
-      <x>650</x>
-      <y>660</y>
+      <x>480</x>
+      <y>680</y>
       <width>151</width>
       <height>41</height>
      </rect>
@@ -67,7 +67,7 @@
     <property name="geometry">
      <rect>
       <x>330</x>
-      <y>720</y>
+      <y>730</y>
       <width>81</width>
       <height>31</height>
      </rect>
@@ -80,7 +80,7 @@
     <property name="geometry">
      <rect>
       <x>420</x>
-      <y>720</y>
+      <y>730</y>
       <width>81</width>
       <height>31</height>
      </rect>
@@ -108,7 +108,7 @@
       <x>20</x>
       <y>330</y>
       <width>611</width>
-      <height>381</height>
+      <height>351</height>
      </rect>
     </property>
    </widget>
@@ -171,7 +171,7 @@
     <property name="geometry">
      <rect>
       <x>150</x>
-      <y>720</y>
+      <y>730</y>
       <width>81</width>
       <height>31</height>
      </rect>
@@ -184,7 +184,7 @@
     <property name="geometry">
      <rect>
       <x>240</x>
-      <y>720</y>
+      <y>730</y>
       <width>81</width>
       <height>30</height>
      </rect>
@@ -204,8 +204,8 @@
     </property>
     <property name="font">
      <font>
-      <family>Franklin Gothic Demi</family>
-      <pointsize>18</pointsize>
+      <family>Fixedsys</family>
+      <pointsize>34</pointsize>
       <weight>50</weight>
       <bold>false</bold>
      </font>
@@ -228,7 +228,7 @@
     </property>
     <property name="font">
      <font>
-      <family>Tempus Sans ITC</family>
+      <family>Fixedsys</family>
       <pointsize>15</pointsize>
       <weight>50</weight>
       <bold>false</bold>
@@ -252,12 +252,56 @@
     <property name="geometry">
      <rect>
       <x>649</x>
-      <y>330</y>
+      <y>340</y>
       <width>151</width>
-      <height>211</height>
+      <height>201</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout"/>
+   </widget>
+   <widget class="QPushButton" name="gCalendarBtn">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>300</y>
+      <width>151</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Fixedsys</family>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color:bisque</string>
+    </property>
+    <property name="text">
+     <string>Calendar(google)</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="gCalendar_addBtn">
+    <property name="geometry">
+     <rect>
+      <x>650</x>
+      <y>550</y>
+      <width>151</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Agency FB</family>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color:bisque</string>
+    </property>
+    <property name="text">
+     <string>일정 추가</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

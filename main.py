@@ -1,9 +1,12 @@
 import sys, os, time, datetime
+
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5 import QtWidgets, QtCore, uic
 from random import *
+from functools import partial
 import googleCalendar
 
 
@@ -11,7 +14,7 @@ import googleCalendar
 # 단, UI파일은 Python 코드 파일과 같은 디렉토리에 위치해야한다.
 global curItem
 gCalendar = []
-gCalendar.append(googleCalendar.main())
+
 
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -19,6 +22,7 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 main_class = uic.loadUiType(resource_path("main.ui"))[0]
+addCalendar_class = uic.loadUiType(resource_path("addCalendar.ui"))[0]
 wiseSayingFile = resource_path("wisesaying.txt")
 
 class MainWindow(QMainWindow, main_class):
@@ -35,16 +39,12 @@ class MainWindow(QMainWindow, main_class):
         timer.timeout.connect(self.showTime)
         timer.start(200)
 
-        i = 0
-        for data in gCalendar:
-            i = i + 1
-            checkboxdata = data[i][0] + data[i][1] + data[i][2]
-            print(checkboxdata)
-            globals()["self.pushButton{}".format(i)] = QCheckBox(checkboxdata)
-            self.verticalLayout.addWidget(globals()["self.pushButton{}".format(i)])
-
+        self.refreshGCalendar()
 
         self.saveMenu.triggered.connect(self.saveMenuClicked)
+
+        self.gCalendarBtn.clicked.connect(self.refreshGCalendar)
+        self.gCalendar_addBtn.clicked.connect(self.gCalendar_addBtnClicked)
 
         self.addListBtn.clicked.connect(self.addListBtnClicked)
         self.doneListBtn.clicked.connect(self.doneListBtnClicked)
@@ -58,8 +58,6 @@ class MainWindow(QMainWindow, main_class):
         self.mainList.itemClicked.connect(self.listClicked)
         self.calendarWidget.clicked.connect(self.calendarClicked)
 
-
-
         wiseSayingList = []
         f = open(wiseSayingFile, 'r', encoding='utf8')
         while True:
@@ -69,6 +67,20 @@ class MainWindow(QMainWindow, main_class):
 
         i = randint(0, len(wiseSayingList))
         self.wiseLabel.setText(wiseSayingList[i])
+
+    def gCalendar_addBtnClicked(self):
+        gCalendarAdd = gCalendarAddDialog()
+        gCalendarAdd.exec_()
+        self.refreshGCalendar()
+
+    def gCalendar_delete(self, id):
+        response = QMessageBox.question(self, 'save', '삭제하시겠습니까?', QMessageBox.Yes | QMessageBox.No)
+        if response == QMessageBox.Yes:
+            googleCalendar.delete(id)
+        else:
+            self.close()
+        self.refreshGCalendar()
+
 
     def saveMenuClicked(self):
         curdatetime = str(datetime.date.today()) + ".txt"
@@ -83,6 +95,31 @@ class MainWindow(QMainWindow, main_class):
         current_time = QTime.currentTime()
         label_time = current_time.toString('hh:mm:ss')
         self.timeLabel.setText(label_time)
+
+    def refreshGCalendar(self):
+        gCalendar = []
+        gCalendar.append(googleCalendar.main())
+
+        for i in reversed(range(self.verticalLayout.count())):
+            self.verticalLayout.itemAt(i).widget().setParent(None)
+
+        i = 0
+        if gCalendar[0]:
+            for data in gCalendar[0]:
+                i = i + 1
+                checkboxdata = data
+                print(checkboxdata)
+                globals()["self.calendar_list{}".format(i)] = QPushButton(
+                    checkboxdata[0] + '\n' + checkboxdata[1] + "\n" + checkboxdata[2])
+                globals()["self.calendar_list{}".format(i)].setStyleSheet("font-size:15px; background-color:bisque;")
+                globals()["self.calendar_list{}".format(i)].clicked.connect(partial(self.gCalendar_delete, checkboxdata[3]))
+                self.verticalLayout.addWidget(globals()["self.calendar_list{}".format(i)])
+        else:
+            self.NoDataLabel = QLabel("No Events Today :)")
+            self.NoDataLabel.setAlignment(Qt.AlignCenter)
+            self.verticalLayout.addWidget(self.NoDataLabel)
+
+
 
     def addListBtnClicked(self):
         item = QtWidgets.QListWidgetItem("New List Added:) Write Here")
@@ -161,6 +198,23 @@ class MainWindow(QMainWindow, main_class):
                 item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
                 item.setCheckState(QtCore.Qt.Unchecked)
                 self.mainList.addItem(item)
+
+class gCalendarAddDialog(QDialog, addCalendar_class):
+    def __init__(self) :
+        super().__init__()
+        self.setupUi(self)
+        self.setWindowTitle("AddCalendar")
+        self.setWindowIcon(QIcon("titleimage.png"))
+        self.gCalendar_popup_saveBtn.clicked.connect(self.gCalendar_popup_save_clicked)
+
+        self.dateEdit.setDate(datetime.datetime.today())
+        self.timeEdit_2.setTime(QTime.currentTime())
+
+    def gCalendar_popup_save_clicked(self):
+        googleCalendar.save(self.dateEdit.date(), self.timeEdit_2.time(), self.lineEdit.text(), self.lineEdit_2.text())
+        self.close()
+        # return event
+
 
 class TimerMessageBox(QMessageBox):
     def __init__(self, timeout=1, parent=None, text=""):

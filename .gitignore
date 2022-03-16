@@ -11,7 +11,8 @@ __pycache__/
 # C extensions
 *.so
 
-# DB
+# json key file
+.json
 
 # Distribution / packaging
 .Python
