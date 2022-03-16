@@ -14,6 +14,7 @@ import googleCalendar
 # UI파일 연결
 # 단, UI파일은 Python 코드 파일과 같은 디렉토리에 위치해야한다.
 global curItem
+global globaldate
 gCalendar = []
 
 
@@ -75,7 +76,7 @@ class MainWindow(QMainWindow, main_class):
             if not fline: break
             wiseSayingList.append(fline.replace("\n", ""))
 
-        i = randint(0, len(wiseSayingList))
+        i = randint(0, len(wiseSayingList)-1)
         self.wiseLabel.setText(wiseSayingList[i])
 
     def gCalendar_addBtnClicked(self):
@@ -99,13 +100,17 @@ class MainWindow(QMainWindow, main_class):
 
 
     def saveMenuClicked(self):
-        curdatetime = str(datetime.date.today()) + ".txt"
-        file = open(curdatetime, "w")
-        for i in range(0, self.mainList.count()):
-            ts = str(self.mainList.item(i).checkState()) + ":" + self.mainList.item(i).text() + "\n"
-            file.write(ts)
-        file.close()
-        QMessageBox.information(self, "result", "저장되었습니다.")
+        if not os.path.exists("datas"):
+            os.makedirs("datas")
+        else:
+            global globaldate
+            filename = "./datas/" + globaldate + ".txt"
+            file = open(filename, "w")
+            for i in range(0, self.mainList.count()):
+                ts = str(self.mainList.item(i).checkState()) + ";" + self.mainList.item(i).text() + "\n"
+                file.write(ts)
+            file.close()
+            QMessageBox.information(self, "result", "저장되었습니다.")
 
     def showTime(self):
         current_time = QTime.currentTime()
@@ -142,7 +147,7 @@ class MainWindow(QMainWindow, main_class):
 
     def addListBtnClicked(self):
         item = QtWidgets.QListWidgetItem("New List Added:) Write Here")
-        item.setFont(QFont("맑은 고딕", 13))
+        item.setFont(QFont("Fixedsys", 13))
         item.setFlags(item.flags() | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEditable)
         item.setCheckState(QtCore.Qt.Unchecked)
         self.mainList.addItem(item)
@@ -193,7 +198,9 @@ class MainWindow(QMainWindow, main_class):
         today = self.calendarWidget.selectedDate().toString(Qt.DefaultLocaleLongDate)
         self.todayLabel.setText(today)
         self.mainList.clear()
-        textFile = "./" + str(self.calendarWidget.selectedDate().toString(Qt.ISODate)) + ".txt"
+        global globaldate
+        globaldate = str(self.calendarWidget.selectedDate().toString(Qt.ISODate))
+        textFile = "./datas/" + globaldate + ".txt"
         try:
             f = open(textFile, 'r')
         except OSError as e:
@@ -203,20 +210,21 @@ class MainWindow(QMainWindow, main_class):
         while True:
             line = f.readline()
             if not line: break
-            column = line.split(":")
+            column = line.split(";")
             if column[0] == '2':
                 item = QtWidgets.QListWidgetItem(column[1].replace("\n", ""))
-                item.setFont(QFont("맑은 고딕", 13))
+                item.setFont(QFont("Fixedsys", 13))
                 item.setFlags(item.flags() | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEditable)
                 item.setCheckState(QtCore.Qt.Checked)
                 item.setBackground(Qt.gray)
                 self.mainList.addItem(item)
             else:
                 item = QtWidgets.QListWidgetItem(column[1].replace("\n", ""))
-                item.setFont(QFont("맑은 고딕", 13))
+                item.setFont(QFont("Fixedsys", 13))
                 item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
                 item.setCheckState(QtCore.Qt.Unchecked)
                 self.mainList.addItem(item)
+
 
 class gCalendarAddDialog(QDialog, addCalendar_class):
     def __init__(self) :
