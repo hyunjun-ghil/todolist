@@ -43,6 +43,7 @@ class MainWindow(QMainWindow, main_class):
 
         today = QDate.currentDate().toString(Qt.DefaultLocaleLongDate)
         self.todayLabel.setText(today)
+        self.mainList.setSpacing(2)
 
         timer = QTimer(self)
         timer.timeout.connect(self.showTime)
@@ -102,15 +103,14 @@ class MainWindow(QMainWindow, main_class):
     def saveMenuClicked(self):
         if not os.path.exists("datas"):
             os.makedirs("datas")
-        else:
-            global globaldate
-            filename = "./datas/" + globaldate + ".txt"
-            file = open(filename, "w")
-            for i in range(0, self.mainList.count()):
-                ts = str(self.mainList.item(i).checkState()) + ";" + self.mainList.item(i).text() + "\n"
-                file.write(ts)
-            file.close()
-            QMessageBox.information(self, "result", "저장되었습니다.")
+        global globaldate
+        filename = "./datas/" + globaldate + ".txt"
+        file = open(filename, "w")
+        for i in range(0, self.mainList.count()):
+            ts = str(self.mainList.item(i).checkState()) + ";" + self.mainList.item(i).text() + "\n"
+            file.write(ts)
+        file.close()
+        QMessageBox.information(self, "result", "저장되었습니다.")
 
     def showTime(self):
         current_time = QTime.currentTime()
@@ -151,6 +151,7 @@ class MainWindow(QMainWindow, main_class):
         item.setFlags(item.flags() | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEditable)
         item.setCheckState(QtCore.Qt.Unchecked)
         self.mainList.addItem(item)
+
 
     def doneListBtnClicked(self):
         currentRow = self.mainList.currentItem()
