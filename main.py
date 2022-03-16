@@ -10,6 +10,7 @@ from functools import partial
 import googleCalendar
 
 
+
 # UI파일 연결
 # 단, UI파일은 Python 코드 파일과 같은 디렉토리에 위치해야한다.
 global curItem
@@ -24,13 +25,20 @@ def resource_path(relative_path):
 main_class = uic.loadUiType(resource_path("main.ui"))[0]
 addCalendar_class = uic.loadUiType(resource_path("addCalendar.ui"))[0]
 wiseSayingFile = resource_path("wisesaying.txt")
+titleImage = resource_path("titleimage.png")
+
+def gCalendar_check():
+    if os.path.exists('token.json') and os.path.exists('credentials.json'):
+        return 1
+    else:
+        return 0
 
 class MainWindow(QMainWindow, main_class):
     def __init__(self) :
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle("ToDoList")
-        self.setWindowIcon(QIcon("titleimage.png"))
+        self.setWindowIcon(QIcon(titleImage))
 
         today = QDate.currentDate().toString(Qt.DefaultLocaleLongDate)
         self.todayLabel.setText(today)
@@ -39,7 +47,9 @@ class MainWindow(QMainWindow, main_class):
         timer.timeout.connect(self.showTime)
         timer.start(200)
 
-        self.refreshGCalendar()
+        result = gCalendar_check()
+        if result:
+            self.refreshGCalendar()
 
         self.saveMenu.triggered.connect(self.saveMenuClicked)
 
@@ -69,14 +79,20 @@ class MainWindow(QMainWindow, main_class):
         self.wiseLabel.setText(wiseSayingList[i])
 
     def gCalendar_addBtnClicked(self):
-        gCalendarAdd = gCalendarAddDialog()
-        gCalendarAdd.exec_()
-        self.refreshGCalendar()
+        if gCalendar_check():
+            gCalendarAdd = gCalendarAddDialog()
+            gCalendarAdd.exec_()
+            self.refreshGCalendar()
+        else:
+            QMessageBox.information(self, "No Auth", "Google Calendar credentials/token이 없습니다.")
 
     def gCalendar_delete(self, id):
         response = QMessageBox.question(self, 'save', '삭제하시겠습니까?', QMessageBox.Yes | QMessageBox.No)
         if response == QMessageBox.Yes:
-            googleCalendar.delete(id)
+            if gCalendar_check():
+                googleCalendar.delete(id)
+            else:
+                QMessageBox.information(self, "No Auth", "Google Calendar credentials/token이 없습니다.")
         else:
             self.close()
         self.refreshGCalendar()
@@ -97,27 +113,30 @@ class MainWindow(QMainWindow, main_class):
         self.timeLabel.setText(label_time)
 
     def refreshGCalendar(self):
-        gCalendar = []
-        gCalendar.append(googleCalendar.main())
+        if gCalendar_check():
+            gCalendar = []
+            gCalendar.append(googleCalendar.main())
 
-        for i in reversed(range(self.verticalLayout.count())):
-            self.verticalLayout.itemAt(i).widget().setParent(None)
+            for i in reversed(range(self.verticalLayout.count())):
+                self.verticalLayout.itemAt(i).widget().setParent(None)
 
-        i = 0
-        if gCalendar[0]:
-            for data in gCalendar[0]:
-                i = i + 1
-                checkboxdata = data
-                print(checkboxdata)
-                globals()["self.calendar_list{}".format(i)] = QPushButton(
-                    checkboxdata[0] + '\n' + checkboxdata[1] + "\n" + checkboxdata[2])
-                globals()["self.calendar_list{}".format(i)].setStyleSheet("font-size:15px; background-color:bisque;")
-                globals()["self.calendar_list{}".format(i)].clicked.connect(partial(self.gCalendar_delete, checkboxdata[3]))
-                self.verticalLayout.addWidget(globals()["self.calendar_list{}".format(i)])
+            i = 0
+            if gCalendar[0]:
+                for data in gCalendar[0]:
+                    i = i + 1
+                    checkboxdata = data
+                    print(checkboxdata)
+                    globals()["self.calendar_list{}".format(i)] = QPushButton(
+                        checkboxdata[0] + '\n' + checkboxdata[1] + "\n" + checkboxdata[2])
+                    globals()["self.calendar_list{}".format(i)].setStyleSheet("font-size:15px; background-color:bisque;")
+                    globals()["self.calendar_list{}".format(i)].clicked.connect(partial(self.gCalendar_delete, checkboxdata[3]))
+                    self.verticalLayout.addWidget(globals()["self.calendar_list{}".format(i)])
+            else:
+                self.NoDataLabel = QLabel("No Events Today :)")
+                self.NoDataLabel.setAlignment(Qt.AlignCenter)
+                self.verticalLayout.addWidget(self.NoDataLabel)
         else:
-            self.NoDataLabel = QLabel("No Events Today :)")
-            self.NoDataLabel.setAlignment(Qt.AlignCenter)
-            self.verticalLayout.addWidget(self.NoDataLabel)
+            QMessageBox.information(self, "No Auth", "Google Calendar credentials/token이 없습니다.")
 
 
 
@@ -204,7 +223,7 @@ class gCalendarAddDialog(QDialog, addCalendar_class):
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle("AddCalendar")
-        self.setWindowIcon(QIcon("titleimage.png"))
+        self.setWindowIcon(QIcon(titleImage))
         self.gCalendar_popup_saveBtn.clicked.connect(self.gCalendar_popup_save_clicked)
 
         self.dateEdit.setDate(datetime.datetime.today())
