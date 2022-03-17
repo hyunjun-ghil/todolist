@@ -55,6 +55,7 @@ class MainWindow(QMainWindow, main_class):
             self.refreshGCalendar()
 
         self.saveMenu.triggered.connect(self.saveMenuClicked)
+        self.saveMenu.setShortcut('Ctrl+S')
         self.loadYesterday.triggered.connect(self.loadYesterdayClicked)
 
         self.gCalendarBtn.clicked.connect(self.refreshGCalendar)
@@ -100,7 +101,6 @@ class MainWindow(QMainWindow, main_class):
         else:
             self.close()
         self.refreshGCalendar()
-
 
     def saveMenuClicked(self):
         if not os.path.exists("datas"):
@@ -256,7 +256,6 @@ class MainWindow(QMainWindow, main_class):
                 item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
                 item.setCheckState(QtCore.Qt.Unchecked)
                 self.mainList.addItem(item)
-
 
 class gCalendarAddDialog(QDialog, addCalendar_class):
     def __init__(self) :
