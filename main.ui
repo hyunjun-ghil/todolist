@@ -318,6 +318,7 @@
      <string>File</string>
     </property>
     <addaction name="saveMenu"/>
+    <addaction name="loadYesterday"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -325,6 +326,11 @@
   <action name="saveMenu">
    <property name="text">
     <string>Save</string>
+   </property>
+  </action>
+  <action name="loadYesterday">
+   <property name="text">
+    <string>Load Yesterday</string>
    </property>
   </action>
  </widget>

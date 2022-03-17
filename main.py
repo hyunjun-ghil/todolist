@@ -55,6 +55,7 @@ class MainWindow(QMainWindow, main_class):
             self.refreshGCalendar()
 
         self.saveMenu.triggered.connect(self.saveMenuClicked)
+        self.loadYesterday.triggered.connect(self.loadYesterdayClicked)
 
         self.gCalendarBtn.clicked.connect(self.refreshGCalendar)
         self.gCalendar_addBtn.clicked.connect(self.gCalendar_addBtnClicked)
@@ -112,6 +113,35 @@ class MainWindow(QMainWindow, main_class):
             file.write(ts)
         file.close()
         QMessageBox.information(self, "result", "저장되었습니다.")
+
+    def loadYesterdayClicked(self):
+        self.mainList.clear()
+        today = datetime.datetime.today()
+        yesterday = (today - datetime.timedelta(1)).strftime("%Y-%m-%d")
+        textFile = "./datas/" + yesterday + ".txt"
+        try:
+            f = open(textFile, 'r')
+        except OSError as e:
+            messagebox = TimerMessageBox(1, self, "저장된 TodoList가 없습니다. 그렇다고 굳이 파일을 생성하지 않으셔도 됩니다.")
+            messagebox.exec_()
+            return
+        while True:
+            line = f.readline()
+            if not line: break
+            column = line.split(";")
+            if column[0] == '2':
+                item = QtWidgets.QListWidgetItem(column[1].replace("\n", ""))
+                item.setFont(QFont("Fixedsys", 13))
+                item.setFlags(item.flags() | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsEditable)
+                item.setCheckState(QtCore.Qt.Checked)
+                item.setBackground(Qt.gray)
+                self.mainList.addItem(item)
+            else:
+                item = QtWidgets.QListWidgetItem(column[1].replace("\n", ""))
+                item.setFont(QFont("Fixedsys", 13))
+                item.setFlags(item.flags() | QtCore.Qt.ItemIsEditable)
+                item.setCheckState(QtCore.Qt.Unchecked)
+                self.mainList.addItem(item)
 
     def showTime(self):
         current_time = QTime.currentTime()
